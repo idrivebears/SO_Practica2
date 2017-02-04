@@ -6,6 +6,8 @@
 int main(int argc, char *argv[])
 {
 	char * f_name = "password.txt";
+	
+	
 
 	// Recibe seg_id del proceso ini
 	if (argc < 2) {
