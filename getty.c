@@ -68,36 +68,29 @@ int main(int argc, char *argv[])
 	sprintf(seg_id_s, "%d", seg_id);
 
 	int login = 0;
-	while(1) 
-	{
-		while(login == 0) 
-		{
+	while(1) {
+		while(login == 0) {
 			printf("Inserte Usuario:> ");
 			
-			if (fgets(line, sizeof(line), stdin)) 
-			{
-			    if (sscanf(line, "%s", &user) == 1) 
-			    {
+			if (fgets(line, sizeof(line), stdin)) {
+			    if (sscanf(line, "%s", &user) == 1) {
 			    	// recibido
 			    }
 			}
 
 			printf("Inserte clave:> ");
 			if (fgets(line, sizeof(line), stdin)) {
-			    if (sscanf(line, "%s", &pass) == 1) 
-			    {
+			    if (sscanf(line, "%s", &pass) == 1) {
 			    	// recibido
 			    }
 			}
 			printf("Verificando...\n");
 
-			if(validate_user(user,pass) == 1) 
-			{
+			if(validate_user(user,pass) == 1) {
 				printf("Login valido.\n", user, pass);
 				login = 1;
 			}
-			else 
-			{
+			else {
 				printf("Login no valido. Vuelva a intentar.\n");
 				login = 0;
 			}
@@ -110,7 +103,7 @@ int main(int argc, char *argv[])
 		if(pid == 0) {
 			execlp("./sh","./sh", seg_id_s, (char *)NULL);
 		}
-		else{
+		else {
 			wait(&status);
 		}
 		

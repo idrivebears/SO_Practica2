@@ -1,0 +1,3 @@
+$PATH : /
+$name : alejandro
+$month : febrero
