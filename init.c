@@ -5,6 +5,7 @@
 #include <sys/ipc.h>
 #include <sys/shm.h>
 #include <fcntl.h>
+#include <string.h>
 
 #define NPROCS 6
 
@@ -14,7 +15,9 @@ int callGetty(int segment_id)
     char s[15];
     sprintf(s, "%d", segment_id);
     printf("Im the son %d, %s\n", segment_id, s);
-    execlp("./getty", s, "ez fix", NULL);  
+    char s1[80] = "x-terminal-emulator -e \"./getty\" ";
+    strcat(s1, s);
+    system(s1);
     exit(0);
 }
 
