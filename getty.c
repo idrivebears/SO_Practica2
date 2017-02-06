@@ -51,48 +51,71 @@ int main(int argc, char *argv[])
 	char line[256];
 	char user[256];
 	char pass[256];
+	char seg_id_s[128];
+	int seg_id;
+
+	int pid;
+	int status;
 
 	// Recibe seg_id del proceso ini
 	if (argc < 2) {
 		return 1;
 	}
 
-	int seg_int = atoi(argv[1]);
-	printf("Segment ID received: %d\n", seg_int);
+	seg_id = atoi(argv[1]);
+	
+	printf("Segment ID received: %d\n", seg_id);
+	sprintf(seg_id_s, "%d", seg_id);
 
 	int login = 0;
-	while(login == 0) 
+	while(1) 
 	{
-		printf("Inserte Usuario:> ");
+		while(login == 0) 
+		{
+			printf("Inserte Usuario:> ");
+			
+			if (fgets(line, sizeof(line), stdin)) 
+			{
+			    if (sscanf(line, "%s", &user) == 1) 
+			    {
+			    	// recibido
+			    }
+			}
+
+			printf("Inserte clave:> ");
+			if (fgets(line, sizeof(line), stdin)) {
+			    if (sscanf(line, "%s", &pass) == 1) 
+			    {
+			    	// recibido
+			    }
+			}
+			printf("Verificando...\n");
+
+			if(validate_user(user,pass) == 1) 
+			{
+				printf("Login valido.\n", user, pass);
+				login = 1;
+			}
+			else 
+			{
+				printf("Login no valido. Vuelva a intentar.\n");
+				login = 0;
+			}
+		}
+		// Llamar al shell
 		
-		if (fgets(line, sizeof(line), stdin)) 
-		{
-		    if (sscanf(line, "%s", &user) == 1) 
-		    {
-		    	// recibido
-		    }
-		}
+		printf("Calling shell[s_id:%s]...\n", seg_id_s);
+		pid = fork();
 
-		printf("Inserte clave:> ");
-		if (fgets(line, sizeof(line), stdin)) {
-		    if (sscanf(line, "%s", &pass) == 1) 
-		    {
-		    	// recibido
-		    }
+		if(pid == 0) {
+			execlp("./sh","./sh", seg_id_s, (char *)NULL);
 		}
-		printf("Verificando...\n");
-
-		if(validate_user(user,pass) == 1) 
-		{
-			printf("Login valido.\n", user, pass);
-			login = 1;
+		else{
+			wait(&status);
 		}
-		else 
-		{
-			printf("Login no valido. Vuelva a intentar.\n");
-			login = 0;
-		}
+		
+		//Regresar del shell y volver a pedir informacion login ^
+		login = 0;
 	}
 
-	
 }
