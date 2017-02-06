@@ -39,10 +39,6 @@ int main()
              callGetty(segment_id);
         }
     }
-
-    for(i=0;i<NPROCS;i++) {
-        wait(&status);
-    }
     printf("Checking for shutdown\n");
     while(!*shutdown) {
         sleep(1);
