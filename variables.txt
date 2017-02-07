@@ -2,3 +2,6 @@ $PATH : /
 $name : alejandro
 $month : febrero
 $other_name : juani
+$look : ls
+$read : cat
+$file : variables.txt

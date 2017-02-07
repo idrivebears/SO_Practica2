@@ -7,7 +7,6 @@
 #include <string.h>
 #include <sys/shm.h>
 
-// add command execution
 // add variable insertion within commands
 // 
 
@@ -44,11 +43,26 @@ const char * retrieve_variable(char * var_name)
 			}
 		}
 		
-		fgetpos (fid, &pos); // remember current position
-		pos_init = 1; // position has been initialized
+		fgetpos (fid, &pos); // remember position
+		pos_init = 1;
 	}
 
 	fclose(fid);
+	return NULL;
+}
+
+int contains_var(char * args)
+{	
+	const char * temp[256];
+	strcpy(temp, args);
+	if(strchr(temp, '$') == NULL){
+		return 0;
+	}
+	return 1;
+}
+
+const char * convert_arguments(char * input) 
+{
 	return NULL;
 }
 
@@ -89,6 +103,7 @@ int main(int argc, char *argv[])
 	const char * var_val;
 	char args[256];
 	int receivedArgs = 0;
+	int containsVar = 0;
 	int pid, status;
 	
 	// int *shutdown;
@@ -105,9 +120,36 @@ int main(int argc, char *argv[])
 		    if (sscanf(input, "%s %s", &command, &args) == 2) {
 		    	//Input received 
 		    	receivedArgs = 1;
+
+		    	if(contains_var(command)) {
+		    		if(retrieve_variable(command) != NULL) {
+		    			strcpy(command, retrieve_variable(command));
+		    		}
+		    		else {
+		    			printf("Command not found.\n");
+		    		}
+		    	}
+
+		    	if(contains_var(args) && strcmp(command,"echo") && strcmp(command,"export")) {
+		    		if(retrieve_variable(args) != NULL) {
+		    			strcpy(args, retrieve_variable(args));
+		    		}
+		    		else {
+		    			printf("$VAR not found.\n");
+		    		}
+		    	}
 		    }
 		    else if (sscanf(input, "%s", &command) == 1) {
 		    	receivedArgs = 0;
+		    	
+		    	if(contains_var(command)) {
+		    		if(retrieve_variable(command) != NULL) {
+		    			strcpy(command, retrieve_variable(command));
+		    		}
+		    		else {
+		    			printf("Command not found.\n");
+		    		}
+		    	}
 		    }
 		    else {
 		    	printf("Invalid input.\n");
@@ -131,6 +173,7 @@ int main(int argc, char *argv[])
 			if(receivedArgs) {
 				if(var_val = retrieve_variable(args) != NULL) {
 					//Variable exists, update value
+					printf("Variable already exists.");
 				}
 				else {
 					//Variable doesnt exist, create new entry
@@ -153,7 +196,7 @@ int main(int argc, char *argv[])
 			else
 				printf("ERROR: Command arguments expected.\n");
 		}
-		
+		// External command must be executed. 
 		else {
 			pid = fork();
 
@@ -167,11 +210,6 @@ int main(int argc, char *argv[])
 				wait(&status);
 			}
 		}
-
-		// if command not found, try executing program
-
-
-
 	}
 
 	return 0;
