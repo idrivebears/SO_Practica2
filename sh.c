@@ -7,12 +7,9 @@
 #include <string.h>
 #include <sys/shm.h>
 
-
-// Commands:
-// export: export variables
-// echo: echo variables
-// exit: exit shell
-// shutdown: shutdown all system
+// add command execution
+// add variable insertion within commands
+// 
 
 const char * retrieve_variable(char * var_name)
 {
@@ -42,6 +39,7 @@ const char * retrieve_variable(char * var_name)
 		if (fscanf(fid,"%s : %s",&var_found, &var_val))
 		{
 			if(strcmp(var_found, var_name) == 0) {
+				fclose(fid);
 				return var_val;
 			}
 		}
@@ -54,49 +52,31 @@ const char * retrieve_variable(char * var_name)
 	return NULL;
 }
 
-const char * insert_variable(char * var_name)
+int insert_variable(char * input)
 {
-	FILE* fid;
-	fpos_t pos;
-	int pos_init = 0;
+	//$VAR=VAL
+	char var_name[256];
+	char var_val[256];
 
-	char var_found[256];
-	static char var_val[256];
-	char line[512];
+	//sscanf(input, "%s%*[^=]%s", var_name, var_val);
+	sscanf(input, "%[^=]%*c%s", var_name, var_val);
 
+	FILE *fid;
+	fid = fopen("variables.txt", "a");
+	
+	if(fid == NULL)
+		return 0;
 
-	if ((fid = fopen("variables.txt","rw+")) == NULL)
-	{
-		//File failed to open
-		fclose(fid);
-		return NULL;
-	}
-
-	// reset position
-	if (pos_init)
-		fsetpos (fid,&pos);
-
-	// read as many line as you can
-	while (!feof(fid))
-	{
-		if (fscanf(fid,"%s : %s",&var_found, &var_val))
-		{
-			if(strcmp(var_found, var_name) == 0) {
-				return var_val;
-			}
-		}
-		
-		fgetpos (fid, &pos); // remember current position
-		pos_init = 1; // position has been initialized
-	}
-
+	fprintf(fid, "%s : %s\n", var_name, var_val);
 	fclose(fid);
-	return NULL;
+
+	return 1;
 }
+
 
 int main(int argc, char *argv[])
 {
-    int *shutdown;
+    
 	// Recibe seg_id del proceso getty
 	if (argc < 2) {
 		return 1;
@@ -109,9 +89,12 @@ int main(int argc, char *argv[])
 	const char * var_val;
 	char args[256];
 	int receivedArgs = 0;
+	int pid, status;
 	
-	shutdown = shmat(seg_id, NULL, 0);
-    int d = *shutdown;
+	// int *shutdown;
+	// shutdown = shmat(seg_id, NULL, 0);
+    // int d = *shutdown;
+
 	printf("\n\nS H E L L  A C T I V A T E D\n\n");
 	printf("Segment ID received: %d\n", seg_id);
 
@@ -121,11 +104,9 @@ int main(int argc, char *argv[])
 		{
 		    if (sscanf(input, "%s %s", &command, &args) == 2) {
 		    	//Input received 
-		    	printf("Received command: %s\nArgs:%s\n", command, args);
 		    	receivedArgs = 1;
 		    }
 		    else if (sscanf(input, "%s", &command) == 1) {
-		    	printf("Received command with no arguments: %s\n", command, args);
 		    	receivedArgs = 0;
 		    }
 		    else {
@@ -134,7 +115,6 @@ int main(int argc, char *argv[])
 		    	continue;
 		    }
 		}
-
 		// Check command and execute corresponding action
 
 		if(strcmp("exit", command) == 0) {
@@ -143,13 +123,21 @@ int main(int argc, char *argv[])
 
 		else if(strcmp("shutdown", command) == 0) {
 			// Escribir a memoria compartida
-			*shutdown = 1;
-	    	printf("turn off %d, %d\n", *shutdown, d);
+			//*shutdown = 1;
+	    	//printf("turn off %d, %d\n", *shutdown, d);
 		}
 
 		else if(strcmp("export", command) == 0) {
 			if(receivedArgs) {
-				
+				if(var_val = retrieve_variable(args) != NULL) {
+					//Variable exists, update value
+				}
+				else {
+					//Variable doesnt exist, create new entry
+					insert_variable(args);
+					printf("Variable added.\n");
+
+				}
 			}
 		}
 
@@ -165,8 +153,24 @@ int main(int argc, char *argv[])
 			else
 				printf("ERROR: Command arguments expected.\n");
 		}
+		
+		else {
+			pid = fork();
+
+			if(pid == 0) {
+				if(receivedArgs)
+					execlp(command, command, args, (char *)NULL);
+				else
+					execlp(command, command, (char *)NULL);
+			}
+			else {
+				wait(&status);
+			}
+		}
 
 		// if command not found, try executing program
+
+
 
 	}
 
