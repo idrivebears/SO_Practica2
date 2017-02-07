@@ -131,7 +131,7 @@ int main(int argc, char *argv[])
     } else if(pid2 > 0) {
         printf("Father \n");
         while(!*shutdown) {
-        
+            sleep(4);
         }
     }
 
