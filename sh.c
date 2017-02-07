@@ -106,9 +106,9 @@ int main(int argc, char *argv[])
 	int containsVar = 0;
 	int pid, status;
 	
-	// int *shutdown;
-	// shutdown = shmat(seg_id, NULL, 0);
-    // int d = *shutdown;
+	int *shutdown;
+	shutdown = shmat(seg_id, NULL, 0);
+    int d = *shutdown;
 
 	printf("\n\nS H E L L  A C T I V A T E D\n\n");
 	printf("Segment ID received: %d\n", seg_id);
@@ -165,8 +165,8 @@ int main(int argc, char *argv[])
 
 		else if(strcmp("shutdown", command) == 0) {
 			// Escribir a memoria compartida
-			//*shutdown = 1;
-	    	//printf("turn off %d, %d\n", *shutdown, d);
+			*shutdown = 1;
+	    	printf("turn off %d, %d\n", *shutdown, d);
 		}
 
 		else if(strcmp("export", command) == 0) {
