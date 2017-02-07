@@ -2,6 +2,11 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <stdio.h>
+#include <sys/wait.h>
+#include <sys/ipc.h>
+#include <sys/shm.h>
+#include <fcntl.h>
 
 int validate_user(char * user, char * pass)
 {
@@ -27,7 +32,7 @@ int validate_user(char * user, char * pass)
 	// read as many line as you can
 	while (!feof(fid))
 	{
-		if (fscanf(fid,"%s : %s",&in_user, &in_pass))
+		if (fscanf(fid,"%s : %s",in_user, in_pass))
 		{
 			if(strcmp(in_user, user) == 0) {
 				if(strcmp(in_pass, pass) == 0) {
@@ -72,24 +77,33 @@ int main(int argc, char *argv[])
 		while(login == 0) {
 			printf("Inserte Usuario:> ");
 			
-			if (fgets(line, sizeof(line), stdin)) {
-			    if (sscanf(line, "%s", &user) == 1) {
+
+			if (fgets(line, sizeof(line), stdin)) 
+			{
+			    if (sscanf(line, "%s", user) == 1) 
+			    {
 			    	// recibido
 			    }
 			}
 
 			printf("Inserte clave:> ");
-			if (fgets(line, sizeof(line), stdin)) {
-			    if (sscanf(line, "%s", &pass) == 1) {
+			if (fgets(line, sizeof(line), stdin)) 
+			{
+
+			    if (sscanf(line, "%s", pass) == 1) 
+			    {
 			    	// recibido
 			    }
 			}
 			printf("Verificando...\n");
 
-			if(validate_user(user,pass) == 1) {
-				printf("Login valido.\n", user, pass);
+
+			if(validate_user(user,pass) == 1) 
+			{
+				printf("Login valido. %s, %s\n", user, pass);
 				login = 1;
 			}
+			
 			else {
 				printf("Login no valido. Vuelva a intentar.\n");
 				login = 0;

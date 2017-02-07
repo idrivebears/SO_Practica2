@@ -5,6 +5,8 @@
 #include <sys/wait.h>
 #include <sys/time.h>
 #include <string.h>
+#include <sys/shm.h>
+
 
 // Commands:
 // export: export variables
@@ -94,6 +96,7 @@ const char * insert_variable(char * var_name)
 
 int main(int argc, char *argv[])
 {
+    int *shutdown;
 	// Recibe seg_id del proceso getty
 	if (argc < 2) {
 		return 1;
@@ -107,7 +110,8 @@ int main(int argc, char *argv[])
 	char args[256];
 	int receivedArgs = 0;
 	
-
+	shutdown = shmat(seg_id, NULL, 0);
+    int d = *shutdown;
 	printf("\n\nS H E L L  A C T I V A T E D\n\n");
 	printf("Segment ID received: %d\n", seg_id);
 
@@ -139,6 +143,8 @@ int main(int argc, char *argv[])
 
 		else if(strcmp("shutdown", command) == 0) {
 			// Escribir a memoria compartida
+			*shutdown = 1;
+	    	printf("turn off %d, %d\n", *shutdown, d);
 		}
 
 		else if(strcmp("export", command) == 0) {
