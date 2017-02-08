@@ -44,11 +44,23 @@ int main()
         printf("i:%d pid:%d", i, pidArr[i]);
     }
 
-    printf("\nChecking for shutdown\n");
+    printf("Checking for shutdown\n");
     pid_t r_pid;
     int status;
+
     while(!*shutdown) {
-        sleep(1);
+
+        for(i = 0; i < NPROCS; i++) {
+            r_pid = waitpid(pidArr[i], &status, WNOHANG);
+
+            if((int) r_pid == pid) {
+                //callGetty(segment_id);
+                printf("Process [%d] closed.\n", pid);
+            }
+            else {
+                //process still running
+            }
+        }
     }
     
     

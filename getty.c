@@ -74,10 +74,8 @@ int main(int argc, char *argv[])
 	sprintf(seg_id_s, "%d", seg_id);
     pid2 = fork(); 
     if(pid2 == 0) {
-        printf("Son \n");
 	    int login = 0;
 	    while(1) {
-	    printf("Hola \n");
 		    while(login == 0) {
 			    printf("Inserte Usuario:> ");
 			
@@ -129,7 +127,6 @@ int main(int argc, char *argv[])
 		    login = 0;
 	    }
     } else if(pid2 > 0) {
-        printf("Father \n");
         while(!*shutdown) {
             sleep(4);
         }
