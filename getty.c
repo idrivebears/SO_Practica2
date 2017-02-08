@@ -57,22 +57,27 @@ int main(int argc, char *argv[])
 	char user[256];
 	char pass[256];
 	char seg_id_s[128];
-	int seg_id;
+    int seg_id;
+	int seg_id2 = 0;
 	int *shutdown;
-
+    int *pidArr;
 	int pid, pid2;
 	int status;
-
+    int id = 0;
 	// Recibe seg_id del proceso ini
 	if (argc < 2) {
 		return 1;
 	}
 
 	seg_id = atoi(argv[1]);
+	seg_id2 = atoi(argv[2]);
+	id = atoi(argv[3]);
 	shutdown = shmat(seg_id, NULL, 0);
-	printf("Segment ID received: %d, %d\n", seg_id, *shutdown);
+	pidArr = shmat(seg_id2, NULL, 0);
+	printf("Segment ID received: %d, %d, %d, %d\n", seg_id, seg_id2, id, *shutdown);
 	sprintf(seg_id_s, "%d", seg_id);
     pid2 = fork(); 
+    printf("pid %d\n", pid2);
     if(pid2 == 0) {
 	    int login = 0;
 	    while(1) {
@@ -127,9 +132,9 @@ int main(int argc, char *argv[])
 		    login = 0;
 	    }
     } else if(pid2 > 0) {
+        pidArr[id] = pid2;
         while(!*shutdown) {
             sleep(4);
         }
     }
-
 }
