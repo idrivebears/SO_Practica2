@@ -1,9 +1,0 @@
-deafault: program
-
-init.o: init.c
-    gcc -c init.c -o init.o
-getty.o: getty.c
-    gcc -c getty.c -o getty.o
-sh.o: sh.c
-    gcc -c sh.c -o sh.o
-
