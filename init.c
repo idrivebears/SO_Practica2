@@ -15,9 +15,7 @@ int callGetty(int segment_id)
     char s[15];
     sprintf(s, "%d", segment_id);
     printf("Im the son %d, %s\n", segment_id, s);
-    char s1[80] = "x-terminal-emulator -e \"./getty\" ";
-    strcat(s1, s);
-    system(s1);
+    execlp("/usr/bin/xterm","/usr/bin/xterm", "-e", "./getty", s,(char *)NULL);
     exit(0);
 }
 
@@ -26,7 +24,7 @@ int main()
     int *shutdown;
     int i;
     int pid;
-    int status;
+    
     int pidArr[6];
     int segment_id = shmget(IPC_PRIVATE, sizeof(shutdown), S_IRUSR | S_IWUSR);
     shutdown = shmat(segment_id, NULL, 0);
@@ -38,14 +36,25 @@ int main()
         if(pid==0) {
              callGetty(segment_id);
         }
+        else{
+            pidArr[i] = pid;
+        }
     }
-    printf("Checking for shutdown\n");
+    for(i = 0;i < NPROCS;i++) {
+        printf("i:%d pid:%d", i, pidArr[i]);
+    }
+
+    printf("\nChecking for shutdown\n");
+    pid_t r_pid;
+    int status;
     while(!*shutdown) {
         sleep(1);
-        
     }
+    
+    
     printf("Fin\n");
     return 0;
 }
+
 
 
