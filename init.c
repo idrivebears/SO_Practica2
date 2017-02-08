@@ -49,8 +49,8 @@ int main()
     int status;
 
     while(!*shutdown) {
-
-        for(i = 0; i < NPROCS; i++) {
+        wait(1);
+        /*for(i = 0; i < NPROCS; i++) {
             r_pid = waitpid(pidArr[i], &status, WNOHANG);
 
             if((int) r_pid == pid) {
@@ -60,7 +60,7 @@ int main()
             else {
                 //process still running
             }
-        }
+        }*/
     }
     
     
